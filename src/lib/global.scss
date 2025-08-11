@@ -1,0 +1,62 @@
+:global {
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+		width: 100%;
+		touch-action: manipulation;
+	}
+
+	* {
+		box-sizing: border-box;
+		position: relative;
+	}
+
+	button {
+		background-color: rgba(black, 0.2);
+		border: none;
+		padding: 8px 12px;
+		max-width: fit-content;
+
+		cursor: pointer;
+
+		&:active {
+			background-color: rgba(black, 0.3);
+		}
+	}
+
+	input {
+		border: none;
+		outline: none;
+
+		padding: 0;
+		padding-bottom: 3px;
+		box-shadow: 0 -1px rgba(black, 0.2) inset;
+
+		&:focus {
+			box-shadow: 0 -1px rgba(black, 1) inset;
+		}
+	}
+
+	a {
+		width: fit-content;
+
+		background-image: url('link-arrow.svg');
+
+		background-position: bottom 0px right 0px;
+		background-size: 18px;
+		background-repeat: no-repeat;
+		padding-right: 24px;
+
+		text-decoration: none;
+
+		&:visited {
+			border: none;
+			outline: none;
+			text-decoration: none;
+			color: inherit;
+			-webkit-tap-highlight-color: white;
+		}
+	}
+}
