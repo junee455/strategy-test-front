@@ -4,8 +4,6 @@
 </script>
 
 <div class="ArchitectureTest">
-	<h1>Architecture test</h1>
-
 	<div class="gameRendrererContainer">
 		<GameRendererWrapper />
 	</div>

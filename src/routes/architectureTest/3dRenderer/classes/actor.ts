@@ -1,13 +1,25 @@
+import type { Renderer3D } from '..';
 import type { TickContext } from '../types';
 import type { Component } from './component';
 import * as THREE from 'three';
 
-export abstract class Actor {
-	position: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+export type ActorBaseConfig = {
+	renderer3d: Renderer3D;
+};
+
+export abstract class Actor<Config> {
+	id: string = '';
+
+	root: THREE.Group = new THREE.Group();
 
 	components?: Component[] = [];
 
-	constructor() {}
+	constructor(
+		protected baseConfig: ActorBaseConfig,
+		protected config?: Config
+	) {}
 
-	abstract onTick?(t: TickContext): void;
+	// public abstract init(): void;
+
+	onTick?(t: TickContext): void;
 }

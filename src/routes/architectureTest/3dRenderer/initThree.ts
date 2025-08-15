@@ -44,7 +44,7 @@ export function initThree(canvas: HTMLCanvasElement) {
 	renderer.setSize(renderWidth, renderHeight);
 
 	const scene = new THREE.Scene();
-	const camera = new THREE.PerspectiveCamera(20, renderWidth / renderHeight, 0.0001, 1000);
+	const camera = new THREE.PerspectiveCamera(20, renderWidth / renderHeight, 0.01, 1000);
 	camera.translateY(1);
 	// const renderSize = 3;
 	// const camera = new THREE.OrthographicCamera(
@@ -60,8 +60,6 @@ export function initThree(canvas: HTMLCanvasElement) {
 	camera.translateZ(10);
 
 	new ResizeObserver((entries) => {
-		return;
-
 		if (!entries[0]) {
 			return;
 		}

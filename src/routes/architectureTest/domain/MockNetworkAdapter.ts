@@ -1,6 +1,7 @@
 import type { SpawnGameEvent } from './eventHandlers';
 import type { ChangeHpEvent } from './eventHandlers/onChangeHp';
 import type { MoveGameEvent } from './eventHandlers/onMoveEvent';
+import type { RecieveDamageEvent } from './eventHandlers/onRecieveDamage';
 import type { GameEvent, GameEventListener } from './interfaces/GameState';
 import type { IGameEventsSource } from './interfaces/IGameEventsEmitter';
 import { Subject } from 'rxjs';
@@ -36,15 +37,15 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 			await wait(500);
 
+			this.sniperMove();
+
+			await wait(1000);
+
 			this.reduceBloodseekerHp();
 
 			await wait(500);
 
 			this.reduceSniperHp();
-
-			await wait(500);
-
-			this.sniperMove();
 		}, 0);
 	}
 
@@ -74,13 +75,14 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 	private async reduceBloodseekerHp() {
 		this.testData.next({
-			type: 'changeHp',
+			type: 'recieveDamage',
 			tick: this.getTime(),
 			payload: {
-				hp: 80,
+				damage: 30,
+				hpLeft: 70,
 				id: '0'
 			}
-		} as ChangeHpEvent);
+		} as RecieveDamageEvent);
 	}
 
 	private sniperMove() {
@@ -91,20 +93,21 @@ export class MockNetworkAdapter implements IGameEventsSource {
 				id: '1',
 				from: [0, 0],
 				to: [1, 2],
-				speed: 0.8
+				speed: 1
 			}
 		} as MoveGameEvent);
 	}
 
 	private async reduceSniperHp() {
 		this.testData.next({
-			type: 'changeHp',
+			type: 'recieveDamage',
 			tick: this.getTime(),
 			payload: {
-				hp: 60,
+				damage: 20,
+				hpLeft: 80,
 				id: '1'
 			}
-		} as ChangeHpEvent);
+		} as RecieveDamageEvent);
 	}
 
 	subscribe(sub: GameEventListener) {
