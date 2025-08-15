@@ -17,7 +17,7 @@ export function lerpOverTime<T>(
 	b: T,
 	timeMs: number,
 	lerp: (a: T, b: T, dt: number) => T,
-	onUpdate: (v: T) => void
+	onUpdate: (v: T, dt?: number) => void
 ) {
 	const start = Date.now();
 
@@ -25,12 +25,12 @@ export function lerpOverTime<T>(
 		const dt = (Date.now() - start) / timeMs;
 
 		if (dt >= 1) {
-			onUpdate(b);
+			onUpdate(b, 1);
 			clearInterval(interval);
 			return;
 		}
 
-		onUpdate(lerp(a, b, dt));
+		onUpdate(lerp(a, b, dt), dt);
 	}, 1000 / 60);
 }
 

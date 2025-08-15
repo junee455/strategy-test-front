@@ -1,4 +1,6 @@
 import { Actor, type ActorBaseConfig } from '../../3dRenderer/classes/actor';
+import type { AttackEvent } from '../../domain/eventHandlers/onAttack';
+import type { MoveGameEvent } from '../../domain/eventHandlers/onMoveEvent';
 import type { RecieveDamagePayload } from '../../domain/eventHandlers/onRecieveDamage';
 import * as THREE from 'three';
 
@@ -30,6 +32,26 @@ export abstract class ACharacterAbstract<
 		this.stats = config.initialStats;
 	}
 
+	rotateTowardsWorldPosition(rotateTowards: THREE.Vector3) {
+		// instant look at
+		this.root.lookAt(rotateTowards);
+
+		// const lookAtRotation = new THREE.Matrix4();
+		// let forward = new THREE.Vector3(0, 0, 1);
+
+		// forward = forward.applyEuler(this.root.rotation);
+
+		// // forward.rot
+
+		// // forward.transformDirection
+
+		// // forward.
+		// // this.root.rotation
+		// lookAtRotation.lookAt(rotateTowards.clone().sub(this.root.position), forward, this.root.up);
+
+		// this.root.applyMatrix4(lookAtRotation);
+	}
+
 	updateStatsProjection() {
 		const statsWorldPosition = this.root.position.clone().add(this.statsPosition3D);
 
@@ -46,4 +68,10 @@ export abstract class ACharacterAbstract<
 	recieveDamage(ev: RecieveDamagePayload): void {
 		this.stats.health = ev.hpLeft;
 	}
+
+	abstract onMoveStart(ev: MoveGameEvent): void;
+
+	abstract onMoveEnd(ev: MoveGameEvent): void;
+
+	abstract onAttack(ev: AttackEvent, targetPosition: [number, number]): void;
 }

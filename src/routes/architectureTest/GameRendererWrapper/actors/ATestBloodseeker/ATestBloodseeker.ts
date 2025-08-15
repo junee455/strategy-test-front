@@ -1,10 +1,11 @@
 import type { ActorBaseConfig } from '../../../3dRenderer/classes/actor';
 import type { TickContext } from '../../../3dRenderer/types';
+import type { AttackEvent } from '../../../domain/eventHandlers/onAttack';
+import type { MoveGameEvent } from '../../../domain/eventHandlers/onMoveEvent';
 import type { RecieveDamagePayload } from '../../../domain/eventHandlers/onRecieveDamage';
 import { lerpOverTime } from '../../../utils';
 import { testSpawnCube } from '../../utils/testSpawnCube';
 import { ACharacterAbstract, type ACharacterStats } from '../ACharacterAbstract';
-import { throwIfEmpty } from 'rxjs';
 import * as THREE from 'three';
 import { lerp } from 'three/src/math/MathUtils.js';
 
@@ -57,8 +58,17 @@ export class ATestBloodseeker extends ACharacterAbstract<{
 		this.root.add(head, body, body2, armor, armor2);
 	}
 
+	onMoveStart(ev: MoveGameEvent): void {
+		this.rotateTowardsWorldPosition(new THREE.Vector3(ev.payload.to[0], 0, ev.payload.to[1]));
+	}
+
+	onMoveEnd(ev: MoveGameEvent) {}
+
+  onAttack(ev: AttackEvent, targetPosition: [number, number]): void {
+    
+  }
+
 	onTick(t: TickContext): void {
-		this.root.rotateY(t.dt);
 		this.updateStatsProjection();
 	}
 

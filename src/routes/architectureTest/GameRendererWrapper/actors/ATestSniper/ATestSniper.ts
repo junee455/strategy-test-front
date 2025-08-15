@@ -1,6 +1,8 @@
 import type { Renderer3D } from '../../../3dRenderer';
 import type { ActorBaseConfig } from '../../../3dRenderer/classes/actor';
 import type { TickContext } from '../../../3dRenderer/types';
+import type { AttackEvent } from '../../../domain/eventHandlers/onAttack';
+import type { MoveGameEvent } from '../../../domain/eventHandlers/onMoveEvent';
 import type { RecieveDamagePayload } from '../../../domain/eventHandlers/onRecieveDamage';
 import { lerpOverTime } from '../../../utils';
 import { testSpawnCube } from '../../utils/testSpawnCube';
@@ -47,8 +49,18 @@ export class ATestSniper extends ACharacterAbstract<{
 		this.root.add(gun, head, body, hood);
 	}
 
+	onMoveEnd(ev: MoveGameEvent): void {}
+
+	onMoveStart(ev: MoveGameEvent): void {
+		this.rotateTowardsWorldPosition(new THREE.Vector3(ev.payload.to[0], 0, ev.payload.to[1]));
+	}
+
+	onAttack(ev: AttackEvent, targetPosition: [number, number]): void {
+		this.rotateTowardsWorldPosition(new THREE.Vector3(targetPosition[0], 0, targetPosition[1]));
+	}
+
 	onTick(t: TickContext): void {
-		this.root.rotateY(t.dt);
+		// this.root.rotateY(t.dt);
 		this.updateStatsProjection();
 	}
 

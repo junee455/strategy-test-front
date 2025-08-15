@@ -3,6 +3,7 @@ import type { Actor } from '../3dRenderer/classes/actor';
 import type { RegisteredActors } from '../3dRenderer/types';
 import type { SpawnGameEvent } from '../domain/eventHandlers';
 import type { KnownCharacterIds } from '../domain/eventHandlers/characters';
+import type { AttackEvent } from '../domain/eventHandlers/onAttack';
 import type { ChangeHpEvent } from '../domain/eventHandlers/onChangeHp';
 import type { MoveGameEvent } from '../domain/eventHandlers/onMoveEvent';
 import type { RecieveDamageEvent } from '../domain/eventHandlers/onRecieveDamage';
@@ -10,8 +11,6 @@ import type { IGameEventsSource } from '../domain/interfaces/IGameEventsEmitter'
 import type { IGameRenderer } from '../domain/interfaces/IGameRenderer';
 import { distance2d, lerpArr2, lerpOverTime } from '../utils';
 import { getCharacterActorClass, type KnownCharacterTypes } from './utils';
-import { Subject } from 'rxjs';
-import * as THREE from 'three';
 
 export class GameRenderer implements IGameRenderer {
 	public renderer3d: Renderer3D;
@@ -56,10 +55,16 @@ export class GameRenderer implements IGameRenderer {
 					payload.to,
 					(distanceFromTo / payload.speed) * 1000,
 					lerpArr2,
-					(v) => {
+					(v, dt) => {
 						char.root.position.set(v[0], 0, v[1]);
+
+						if (dt === 1) {
+							char.onMoveEnd(upd as MoveGameEvent);
+						}
 					}
 				);
+
+				char.onMoveStart(upd as MoveGameEvent);
 			} else if ((upd as ChangeHpEvent).type === 'changeHp') {
 				const { payload } = upd as ChangeHpEvent;
 
@@ -80,6 +85,26 @@ export class GameRenderer implements IGameRenderer {
 				}
 
 				char.recieveDamage(payload);
+			} else if ((upd as AttackEvent).type === 'attack') {
+				const { payload } = upd as AttackEvent;
+
+				const char = findTargetCharacter({ id: payload.id });
+
+				if (!char) {
+					return;
+				}
+
+				const targetChar = findTargetCharacter({ id: payload.targetId });
+
+				if (!targetChar) {
+					return;
+				}
+
+				targetChar.onAttack(upd as AttackEvent, [
+					targetChar.root.position.x,
+					targetChar.root.position.z
+				]);
+				// const targetLocation =
 			}
 		});
 	}

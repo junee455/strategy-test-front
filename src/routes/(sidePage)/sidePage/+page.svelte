@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState } from '../../architectureTest/api/GameContext.svelte';
+	import { gameState } from '../../controlsTest/api/GameContext.svelte';
 
 	let checkInputValue = $state<string>();
 </script>

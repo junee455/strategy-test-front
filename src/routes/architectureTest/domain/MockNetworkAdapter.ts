@@ -1,4 +1,6 @@
+import { distance2d } from '../utils';
 import type { SpawnGameEvent } from './eventHandlers';
+import type { AttackEvent } from './eventHandlers/onAttack';
 import type { ChangeHpEvent } from './eventHandlers/onChangeHp';
 import type { MoveGameEvent } from './eventHandlers/onMoveEvent';
 import type { RecieveDamageEvent } from './eventHandlers/onRecieveDamage';
@@ -31,13 +33,19 @@ export class MockNetworkAdapter implements IGameEventsSource {
 		return Date.now() - this.timeStart;
 	}
 
+	charPositions = {
+		'0': [0, 0] as [number, number],
+		'1': [1, 1] as [number, number]
+	};
+
 	constructor() {
 		setTimeout(async () => {
 			await this.initCharacters();
 
 			await wait(500);
 
-			this.sniperMove();
+			this.initSniperActionsLoop();
+			this.initRandomMove('1');
 
 			await wait(1000);
 
@@ -47,6 +55,67 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 			this.reduceSniperHp();
 		}, 0);
+	}
+
+	private async initSniperActionsLoop() {
+		const charId = '0';
+
+		const randomTo = [Math.random() * 10 - 5, Math.random() * 10 - 5] as [number, number];
+
+		const distance = distance2d(this.charPositions[charId], randomTo);
+
+		const speed = Math.random() * 3 + 1;
+
+		const time = (distance / speed) * 1000 + 300;
+
+		console.log('sniper start move');
+
+		this.charMove(charId, this.charPositions[charId], randomTo, speed);
+
+		this.charPositions[charId] = randomTo;
+
+		await wait(time);
+
+		console.log('sniper end move');
+
+		console.log('sniper attack');
+
+		this.testData.next({
+			type: 'attack',
+			tick: this.getTime(),
+			payload: {
+				attackType: 'range',
+				projectileSpeed: 100,
+				damage: 10,
+				id: '0',
+				targetId: '1'
+				// characterId: 'sniper',
+				// id: '1'
+			}
+		} as AttackEvent);
+
+		await wait(1000);
+
+		console.log('sniper loop end ~~~~~~~~');
+
+
+		setTimeout(async () => this.initSniperActionsLoop(), 0);
+	}
+
+	private initRandomMove(charId: '0' | '1') {
+		const randomTo = [Math.random() * 10 - 5, Math.random() * 10 - 5] as [number, number];
+
+		const distance = distance2d(this.charPositions[charId], randomTo);
+
+		const speed = Math.random() * 3 + 1;
+
+		const time = (distance / speed) * 1000 + 300;
+
+		this.charMove(charId, this.charPositions[charId], randomTo, speed);
+
+		this.charPositions[charId] = randomTo;
+
+		setTimeout(() => this.initRandomMove(charId), time);
 	}
 
 	private async initCharacters() {
@@ -85,15 +154,15 @@ export class MockNetworkAdapter implements IGameEventsSource {
 		} as RecieveDamageEvent);
 	}
 
-	private sniperMove() {
+	private charMove(id: string, from: [number, number], to: [number, number], speed: number) {
 		this.testData.next({
 			type: 'move',
 			tick: this.getTime(),
 			payload: {
-				id: '1',
-				from: [0, 0],
-				to: [1, 2],
-				speed: 1
+				id: id,
+				from,
+				to,
+				speed
 			}
 		} as MoveGameEvent);
 	}
