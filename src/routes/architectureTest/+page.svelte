@@ -8,7 +8,7 @@
 		<GameRendererWrapper />
 	</div>
 
-	<div class="eventLog">
+	<!-- <div class="eventLog">
 		{#each gameState.eventLog as singleEvent, i}
 			<div class="logPiece">
 				<div>
@@ -25,7 +25,7 @@
 				<div></div>
 			</div>
 		{/each}
-	</div>
+	</div> -->
 </div>
 
 <style lang="scss">

@@ -1,6 +1,6 @@
 import type { Actor } from './classes/actor';
 import { initThree, type IRendererState, type IRendererTickCallback } from './initThree';
-import type { TickContext } from './types';
+import type { RegisteredActors, TickContext } from './types';
 import * as THREE from 'three';
 
 export interface Renderer3DConfig {
@@ -18,6 +18,8 @@ export class Renderer3D {
 	camera: THREE.Camera;
 
 	canvasEl: HTMLCanvasElement;
+
+	registeredIds: string[] = [];
 
 	actors: Actor<any>[] = [];
 
@@ -38,6 +40,37 @@ export class Renderer3D {
 		});
 
 		this.camera = this.rendererState.camera;
+	}
+
+	public spawnFromClass(c: RegisteredActors, id?: string, config?: unknown): Actor<unknown> {
+		if (this.registeredIds.includes(id as string)) {
+			throw new Error(`an actor with id '${id}' already exists`);
+		}
+
+		const obj = new c(
+			{
+				renderer3d: this
+			},
+			config
+		);
+
+		obj.id = id === undefined ? this.registerNextId() : this.updateId(id);
+
+		this.addActor(obj);
+
+		return obj;
+	}
+
+	private updateId(id: string) {
+		const tryNum = Number(id);
+
+		if (isNaN(tryNum)) {
+			return id;
+		}
+
+		this.lastId = tryNum;
+
+		return id;
 	}
 
 	private registerNextId() {

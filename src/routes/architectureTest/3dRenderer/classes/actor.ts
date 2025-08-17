@@ -22,4 +22,8 @@ export abstract class Actor<Config> {
 	// public abstract init(): void;
 
 	onTick?(t: TickContext): void;
+
+	destroy() {
+		this.baseConfig.renderer3d.destroyActor(this);
+	}
 }

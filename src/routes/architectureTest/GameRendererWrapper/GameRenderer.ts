@@ -100,30 +100,10 @@ export class GameRenderer implements IGameRenderer {
 					return;
 				}
 
-				targetChar.onAttack(upd as AttackEvent, [
-					targetChar.root.position.x,
-					targetChar.root.position.z
-				]);
+				char.onAttack(upd as AttackEvent, targetChar as unknown as Actor<void>);
 				// const targetLocation =
 			}
 		});
-	}
-
-	public spawnFromClass(c: RegisteredActors, id: string, config?: any) {
-		const obj = new c(
-			{
-				renderer3d: this.renderer3d
-			},
-			config
-		);
-
-		obj.id = id;
-
-		this.objects.push(obj);
-
-		this.renderer3d.addActor(obj);
-
-		return obj;
 	}
 
 	public spawnCharacter(charId: KnownCharacterIds, id: string) {
@@ -133,7 +113,7 @@ export class GameRenderer implements IGameRenderer {
 			return;
 		}
 
-		const char = this.spawnFromClass(classChar, id);
+		const char = this.renderer3d.spawnFromClass(classChar, id);
 
 		this.characters.push(char);
 	}

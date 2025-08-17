@@ -1,5 +1,5 @@
 import type { Renderer3D } from '../../../3dRenderer';
-import type { ActorBaseConfig } from '../../../3dRenderer/classes/actor';
+import type { Actor, ActorBaseConfig } from '../../../3dRenderer/classes/actor';
 import type { TickContext } from '../../../3dRenderer/types';
 import type { AttackEvent } from '../../../domain/eventHandlers/onAttack';
 import type { MoveGameEvent } from '../../../domain/eventHandlers/onMoveEvent';
@@ -7,6 +7,7 @@ import type { RecieveDamagePayload } from '../../../domain/eventHandlers/onRecie
 import { lerpOverTime } from '../../../utils';
 import { testSpawnCube } from '../../utils/testSpawnCube';
 import { ACharacterAbstract, type ACharacterStats } from '../ACharacterAbstract';
+import { ABullet } from '../BulletActor/ABullet';
 import * as THREE from 'three';
 import { lerp } from 'three/src/math/MathUtils.js';
 
@@ -19,6 +20,10 @@ export class ATestSniper extends ACharacterAbstract<{
 	initialStats: ACharacterStats;
 }> {
 	public statsPosition3D: THREE.Vector3 = new THREE.Vector3(0, 2, 0);
+
+	public projectiles: ABullet[] = [];
+
+	private gunMesh: THREE.Object3D;
 
 	constructor(baseConfig: ActorBaseConfig, config?: void) {
 		super(baseConfig, {
@@ -33,6 +38,8 @@ export class ATestSniper extends ACharacterAbstract<{
 		});
 
 		const gun = testSpawnCube(GUN_COLOR, [0.2, 0.4, 1.5]);
+
+		this.gunMesh = gun;
 
 		gun.translateX(-0.5);
 
@@ -49,14 +56,31 @@ export class ATestSniper extends ACharacterAbstract<{
 		this.root.add(gun, head, body, hood);
 	}
 
+	private spawnProjectile() {
+		const newProjectile = this.baseConfig.renderer3d.spawnFromClass(ABullet) as ABullet;
+		this.projectiles.push(newProjectile);
+
+		return newProjectile;
+	}
+
 	onMoveEnd(ev: MoveGameEvent): void {}
 
 	onMoveStart(ev: MoveGameEvent): void {
 		this.rotateTowardsWorldPosition(new THREE.Vector3(ev.payload.to[0], 0, ev.payload.to[1]));
 	}
 
-	onAttack(ev: AttackEvent, targetPosition: [number, number]): void {
-		this.rotateTowardsWorldPosition(new THREE.Vector3(targetPosition[0], 0, targetPosition[1]));
+	onAttack(ev: AttackEvent, targetActor: Actor<void>): void {
+		this.rotateTowardsWorldPosition(targetActor.root.position);
+		const newProjectile = this.spawnProjectile();
+
+		const projectileStartPositin = new THREE.Vector3();
+
+		this.gunMesh.getWorldPosition(projectileStartPositin);
+
+		newProjectile.root.position.copy(projectileStartPositin);
+
+		// newProjectile.follow(targetActor, ev.payload.projectileSpeed || 100);
+		newProjectile.follow(targetActor, 10);
 	}
 
 	onTick(t: TickContext): void {

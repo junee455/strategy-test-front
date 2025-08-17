@@ -73,5 +73,5 @@ export abstract class ACharacterAbstract<
 
 	abstract onMoveEnd(ev: MoveGameEvent): void;
 
-	abstract onAttack(ev: AttackEvent, targetPosition: [number, number]): void;
+	abstract onAttack(ev: AttackEvent, targetActor: Actor<void>): void;
 }

@@ -45,7 +45,7 @@ export class MockNetworkAdapter implements IGameEventsSource {
 			await wait(500);
 
 			this.initSniperActionsLoop();
-			this.initRandomMove('1');
+			this.initRandomMove('0');
 
 			await wait(1000);
 
@@ -58,7 +58,7 @@ export class MockNetworkAdapter implements IGameEventsSource {
 	}
 
 	private async initSniperActionsLoop() {
-		const charId = '0';
+		const charId = '1';
 
 		const randomTo = [Math.random() * 10 - 5, Math.random() * 10 - 5] as [number, number];
 
@@ -68,17 +68,11 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 		const time = (distance / speed) * 1000 + 300;
 
-		console.log('sniper start move');
-
 		this.charMove(charId, this.charPositions[charId], randomTo, speed);
 
 		this.charPositions[charId] = randomTo;
 
 		await wait(time);
-
-		console.log('sniper end move');
-
-		console.log('sniper attack');
 
 		this.testData.next({
 			type: 'attack',
@@ -87,8 +81,8 @@ export class MockNetworkAdapter implements IGameEventsSource {
 				attackType: 'range',
 				projectileSpeed: 100,
 				damage: 10,
-				id: '0',
-				targetId: '1'
+				id: '1',
+				targetId: '0'
 				// characterId: 'sniper',
 				// id: '1'
 			}
@@ -96,10 +90,8 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 		await wait(1000);
 
-		console.log('sniper loop end ~~~~~~~~');
-
-
-		setTimeout(async () => this.initSniperActionsLoop(), 0);
+		this.initSniperActionsLoop();
+		// setTimeout(async () => this.initSniperActionsLoop(), 0);
 	}
 
 	private initRandomMove(charId: '0' | '1') {
@@ -107,9 +99,9 @@ export class MockNetworkAdapter implements IGameEventsSource {
 
 		const distance = distance2d(this.charPositions[charId], randomTo);
 
-		const speed = Math.random() * 3 + 1;
+		const speed = Math.random() * 3 + 6;
 
-		const time = (distance / speed) * 1000 + 300;
+		const time = (distance / speed) * 1000 + 10;
 
 		this.charMove(charId, this.charPositions[charId], randomTo, speed);
 
